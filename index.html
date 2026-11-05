@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.I.C.A.E. Enterprise // Terminal Biométrico ZKTeco K14 | Gestión de Acceso</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #0a2540;
+            --brand-blue: #0284c7;
+            --brand-cyan: #00b4d8;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fb;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.07) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(10, 37, 64, 0.06) 0px, transparent 50%);
+            color: #0f172a;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-hud { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+
+        /* Corporate SaaS Card Styling */
+        .corp-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        }
+
+        /* Realistic Modern ZKTeco K14 Hardware Chassis */
+        .zk-chassis {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 60%, #090d16 100%);
+            border: 1px solid #334155;
+            box-shadow:
+                0 25px 50px -12px rgba(15, 23, 42, 0.28),
+                0 0 0 6px rgba(226, 232, 240, 0.8),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+        .zk-screen {
+            background: linear-gradient(180deg, #0f172a 0%, #09101d 100%);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: inset 0 2px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Optical Fingerprint Sensor Pad */
+        .scanner-pad {
+            position: relative;
+            width: 148px;
+            height: 182px;
+            border-radius: 74px;
+            background: radial-gradient(circle at 50% 42%, rgba(14, 165, 233, 0.22), rgba(15, 23, 42, 0.96) 72%);
+            border: 2px solid rgba(56, 189, 248, 0.55);
+            box-shadow:
+                0 12px 30px -4px rgba(2, 132, 199, 0.28),
+                inset 0 0 24px rgba(14, 165, 233, 0.25);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        .scanner-pad::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border-radius: 66px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            pointer-events: none;
+        }
+        .scanner-pad:hover {
+            border-color: #38bdf8;
+            box-shadow:
+                0 16px 36px -4px rgba(2, 132, 199, 0.4),
+                inset 0 0 28px rgba(56, 189, 248, 0.35);
+            transform: translateY(-2px);
+        }
+        .scanner-pad.scanning {
+            border-color: #f59e0b;
+            box-shadow:
+                0 0 40px rgba(245, 158, 11, 0.45),
+                inset 0 0 30px rgba(245, 158, 11, 0.3);
+            transform: scale(0.98);
+        }
+        .scanner-pad.success-entry {
+            border-color: #10b981;
+            box-shadow:
+                0 0 45px rgba(16, 185, 129, 0.55),
+                inset 0 0 35px rgba(16, 185, 129, 0.35);
+        }
+        .scanner-pad.success-exit {
+            border-color: #0ea5e9;
+            box-shadow:
+                0 0 45px rgba(14, 165, 233, 0.55),
+                inset 0 0 35px rgba(14, 165, 233, 0.35);
+        }
+        .laser-line {
+            position: absolute;
+            left: 12%;
+            width: 76%;
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, #38bdf8, #ffffff, #38bdf8, transparent);
+            box-shadow: 0 0 14px #38bdf8;
+            opacity: 0;
+            top: 15%;
+            pointer-events: none;
+        }
+        .scanner-pad.scanning .laser-line {
+            opacity: 1;
+            animation: laserSweep 1.15s ease-in-out infinite;
+        }
+        @keyframes laserSweep {
+            0% { top: 15%; }
+            50% { top: 83%; }
+            100% { top: 15%; }
+        }
+        @keyframes subtlePulse {
+            0% { transform: scale(0.97); opacity: 0.55; }
+            70% { transform: scale(1.12); opacity: 0; }
+            100% { transform: scale(1.12); opacity: 0; }
+        }
+        .pulse-ring {
+            position: absolute;
+            inset: -7px;
+            border-radius: 82px;
+            border: 1.5px solid rgba(56, 189, 248, 0.45);
+            animation: subtlePulse 2.5s infinite;
+            pointer-events: none;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- EXECUTIVE CORPORATE TOPBAR -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-[#0a2540] flex items-center justify-center text-sky-400 shadow-sm">
+                    <i class="fa-solid fa-fingerprint text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="font-display font-extrabold text-lg tracking-tight text-[#0a2540]">S.I.C.A.E.</span>
+                        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+                            Terminal de Acceso • Hub Biométrico K14
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Sistema Inteligente de Control de Asistencia Estudiantil</p>
+                </div>
+            </div>
+
+            <!-- Corporate Controls & Live Status -->
+            <div class="flex items-center flex-wrap gap-2.5">
+                <div id="sync-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 -ml-4"></span>
+                    <span id="sync-badge-text">Conectado con App Padres en Tiempo Real</span>
+                </div>
+
+                <button id="btn-toggle-mirror" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/80 text-xs font-semibold transition flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-mobile-screen-button text-sky-600"></i>
+                    <span id="mirror-btn-label">Mostrar Celular Espejo (En Vivo)</span>
+                </button>
+
+                <button id="btn-toggle-sound" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center justify-center transition cursor-pointer" title="Activar/Silenciar audio del terminal">
+                    <i class="fa-solid fa-volume-high text-sky-600" id="sound-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT COLUMN: STUDENT DIRECTORY & COMPLIANCE (4 cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-5">
+
+            <!-- Student Selector Card -->
+            <div class="corp-card rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="font-display font-bold text-sm text-[#0a2540] flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs font-bold border border-sky-100">1</span>
+                        Nómina de Estudiantes Activos
+                    </h2>
+                    <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full" id="student-count-badge">6 registrados</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                    Seleccione el estudiante que registrará su huella en el reloj biométrico de entrada o incorpore un alumno nuevo para la demostración:
+                </p>
+
+                <div id="student-list" class="space-y-2 max-h-80 overflow-y-auto custom-scroll pr-1"></div>
+
+                <!-- Add Custom Student -->
+                <div class="mt-4 pt-3.5 border-t border-slate-100">
+                    <button id="btn-open-custom" class="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-sky-50/60 border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 hover:text-sky-700 flex items-center justify-center gap-2 transition cursor-pointer">
+                        <i class="fa-solid fa-user-plus text-sky-600"></i> + Agregar otro alumno para probar
+                    </button>
+                    <form id="custom-student-form" class="hidden mt-3 space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <input type="text" id="inp-student-name" placeholder="Nombre completo (ej: Mateo Silva)" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:border-sky-500 outline-none">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="inp-student-group" placeholder="Grupo (ej: 3°DC)" value="3°DC - BTP" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:border-sky-500 outline-none">
+                            <input type="text" id="inp-student-ci" placeholder="C.I. (ej: 5.412.890-3)" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:border-sky-500 outline-none">
+                        </div>
+                        <input type="text" id="inp-parent-name" placeholder="Padre / Madre / Tutor (ej: Laura Méndez)" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:border-sky-500 outline-none">
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 py-2 rounded-lg bg-[#0a2540] hover:bg-slate-800 text-white font-semibold text-xs transition cursor-pointer">Guardar y Seleccionar</button>
+                            <button type="button" id="btn-cancel-custom" class="px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-600 text-xs hover:bg-slate-100 cursor-pointer">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Institutional & Legal Guarantee Card -->
+            <div class="corp-card rounded-2xl p-5">
+                <h3 class="font-display font-bold text-xs uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-sky-600"></i> Garantías Operativas e Institucionales
+                </h3>
+                <div class="space-y-2.5 text-xs text-slate-600">
+                    <div class="flex items-start gap-3 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
+                        <div class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 block font-semibold">Cumplimiento Ley N.° 18.331</strong>
+                            El sistema no almacena imágenes de huellas; transforma la lectura en un código matemático irreversible (<span class="font-mono-tech text-sky-700 font-medium">Hash SHA-256 / AES-256</span>).
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 bg-slate-50/80 p-3 rounded-xl border border-slate-200/70">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 block font-semibold">Aviso Instantáneo a las Familias</strong>
+                            Al validar la huella, el reloj envía una notificación automática a la aplicación móvil de los padres informando la hora exacta de llegada o salida.
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 text-[11px] font-medium text-slate-500 border-t border-slate-100">
+                        <span><i class="fa-solid fa-battery-full text-emerald-600 mr-1"></i> Respaldo UPS (6 h)</span>
+                        <span><i class="fa-solid fa-server text-sky-600 mr-1"></i> Red Intranet Local</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER COLUMN: ZKTECO K14 BIOMETRIC DEVICE + AUDIT LOG (8 cols or 5 cols) -->
+        <section id="terminal-column" class="lg:col-span-8 flex flex-col gap-5">
+
+            <!-- Physical ZKTeco K14 Device Simulation -->
+            <div class="zk-chassis rounded-3xl p-5 sm:p-7 text-white relative">
+                <!-- Device Top Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-700/80">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-lg bg-white/10 border border-white/15 font-display text-xs text-white font-bold tracking-wide">
+                            ZKTeco K14
+                        </span>
+                        <span class="text-xs text-slate-300 font-medium">Hub Biométrico Institucional • Puerta Principal UTU Las Piedras 2</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-medium">
+                        <span class="flex items-center gap-1.5 text-emerald-400"><i class="fa-solid fa-wifi"></i> En línea</span>
+                        <span class="flex items-center gap-1.5 text-sky-300"><i class="fa-solid fa-lock"></i> AES-256</span>
+                        <div id="led-indicator" class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]" title="Indicador luminoso del reloj"></div>
+                    </div>
+                </div>
+
+                <!-- Device Screen & Fingerprint Sensor Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+
+                    <!-- Left: IPS Color Display of the Clock (7 cols) -->
+                    <div class="md:col-span-7 zk-screen rounded-2xl p-5 flex flex-col justify-between min-h-[340px]">
+                        <!-- Display Header -->
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3.5">
+                            <div>
+                                <div class="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">Escuela Técnica Las Piedras 2</div>
+                                <div id="live-date" class="text-xs text-slate-400 mt-0.5">Martes, 27 de Octubre 2026</div>
+                            </div>
+                            <div class="text-right">
+                                <div id="live-clock" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">07:45:12</div>
+                                <div class="text-[10px] font-medium text-emerald-400">Hora Oficial Sincronizada</div>
+                            </div>
+                        </div>
+
+                        <!-- Mode Selector (Only ENTRADA and SALIDA) -->
+                        <div class="my-3.5">
+                            <div class="text-[11px] font-medium text-slate-400 mb-1.5">Seleccione el movimiento a registrar:</div>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <button type="button" data-mode="ENTRADA" class="mode-btn active-mode py-2.5 px-3 rounded-xl border border-emerald-400 bg-emerald-500/20 text-white text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="fa-solid fa-right-to-bracket text-emerald-400"></i> ENTRADA
+                                </button>
+                                <button type="button" data-mode="SALIDA" class="mode-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 hover:border-sky-400/50 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+                                    <i class="fa-solid fa-right-from-bracket text-sky-400"></i> SALIDA
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Student Card on Screen -->
+                        <div id="lcd-status-box" class="bg-slate-900/95 border border-slate-700/80 rounded-xl p-4 my-1">
+                            <div class="flex items-center gap-3.5">
+                                <div id="lcd-avatar" class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center font-display font-bold text-sky-300 text-base shrink-0">
+                                    FL
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span id="lcd-student-name" class="font-display font-bold text-white text-sm sm:text-base truncate">Facundo Lauradrid</span>
+                                        <span id="lcd-student-CurrentState" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 shrink-0">Fuera del centro</span>
+                                    </div>
+                                    <div id="lcd-student-meta" class="text-xs text-sky-300 mt-0.5">Grupo: 3°DC • C.I.: 5.482.190-4</div>
+                                    <div id="lcd-parent-meta" class="text-[11px] text-slate-400 mt-1 truncate">
+                                        <i class="fa-solid fa-mobile-screen text-emerald-400 mr-1"></i> Notificar a: <span class="text-slate-200 font-medium">Adriana Lauradrid</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Scan Progress -->
+                            <div class="mt-3.5 pt-3 border-t border-slate-800">
+                                <div class="flex justify-between text-xs font-medium mb-1.5">
+                                    <span id="lcd-message" class="text-slate-200">Coloque su dedo en el lector óptico...</span>
+                                    <span id="lcd-percent" class="text-sky-400 font-semibold">Listo</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                    <div id="lcd-progress" class="h-full w-0 bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-75"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Screen Footer -->
+                        <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                            <span class="truncate max-w-[74%] font-mono-tech" id="lcd-hash">Token: En espera de lectura</span>
+                            <span class="text-emerald-400 font-medium shrink-0"><i class="fa-solid fa-circle-check mr-1"></i> Puerta #01</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Optical Sensor Area (5 cols) -->
+                    <div class="md:col-span-5 flex flex-col items-center justify-center py-2">
+                        <div class="text-center mb-3">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-white/10 border border-white/15 text-sky-200">
+                                2. Sensor Óptico de Huella
+                            </span>
+                        </div>
+
+                        <!-- Interactive Sensor Pad -->
+                        <div id="scanner-pad" class="scanner-pad flex flex-col items-center justify-center cursor-pointer group" role="button" tabindex="0" aria-label="Escanear huella digital">
+                            <div class="pulse-ring"></div>
+                            <div class="laser-line"></div>
+                            <i id="scanner-icon" class="fa-solid fa-fingerprint text-6xl text-sky-400 group-hover:scale-105 transition-transform duration-300"></i>
+                            <span id="scanner-subtext" class="mt-3 text-[11px] font-medium text-slate-300 text-center px-3 leading-tight">
+                                Presionar para marcar<br>entrada o salida
+                            </span>
+                        </div>
+
+                        <!-- Sensor Caption -->
+                        <div class="mt-4 w-full max-w-[235px]">
+                            <p class="text-[11px] text-center text-slate-400 leading-relaxed">
+                                Dispara aviso inmediato a <strong class="text-white">App Padres</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CORPORATE ATTENDANCE & NOTIFICATION LOG TABLE -->
+            <div class="corp-card rounded-2xl p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h3 class="font-display font-bold text-sm text-[#0a2540] flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-sky-600"></i> Registro de Marcaciones y Avisos Enviados a Familias
+                        </h3>
+                        <p class="text-xs text-slate-500">Auditoría institucional en tiempo real de ingresos, egresos y confirmaciones móviles.</p>
+                    </div>
+                    <button id="btn-clear-logs" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200 hover:bg-rose-50 transition cursor-pointer">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Limpiar historial
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="py-3 px-3.5 rounded-tl-lg">Hora</th>
+                                <th class="py-3 px-3.5">Movimiento</th>
+                                <th class="py-3 px-3.5">Estudiante</th>
+                                <th class="py-3 px-3.5">Familiar Notificado</th>
+                                <th class="py-3 px-3.5">Código Hash (Ley 18.331)</th>
+                                <th class="py-3 px-3.5 text-right rounded-tr-lg">Estado Notificación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clock-logs-body" class="divide-y divide-slate-200/70 text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPTIONAL RIGHT COLUMN: LIVE SMARTPHONE PREVIEW (3 cols when open) -->
+        <aside id="mirror-column" class="hidden lg:col-span-3 flex-col gap-4">
+            <div class="corp-card rounded-2xl p-4 border-sky-200">
+                <div class="flex items-center justify-between mb-2.5 pb-2.5 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="font-display font-bold text-xs text-[#0a2540]">Vista Previa: App Padres</span>
+                    </div>
+                    <button id="btn-close-mirror" class="text-slate-400 hover:text-slate-700 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
+                    Si tenés abierta la <strong>Web 2 (App Padres)</strong> en otra ventana, recibirá el aviso automáticamente. También podés ver aquí un espejo del teléfono del tutor:
+                </p>
+
+                <!-- Clean Executive Smartphone Preview -->
+                <div class="bg-slate-900 border-[5px] border-slate-800 rounded-[30px] p-3 shadow-lg min-h-[390px] flex flex-col justify-between text-white">
+                    <div>
+                        <div class="w-14 h-1.5 bg-slate-700 rounded-full mx-auto mb-2.5"></div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mb-2.5 px-1">
+                            <span id="mirror-phone-time" class="font-semibold text-white">07:45</span>
+                            <span>5G <i class="fa-solid fa-battery-full text-emerald-400 ml-1"></i></span>
+                        </div>
+
+                        <div class="bg-[#0a2540] border border-sky-500/30 rounded-2xl p-3 mb-3">
+                            <div class="text-[10px] font-semibold text-sky-300 uppercase">S.I.C.A.E. Parent Connect</div>
+                            <div class="text-xs font-bold text-white mt-0.5">Avisos de Asistencia</div>
+                        </div>
+
+                        <div id="mirror-notifications" class="space-y-2 max-h-[245px] overflow-y-auto custom-scroll pr-1"></div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800 text-center text-[10px] text-slate-400">
+                        Sincronización instantánea activa
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- CORPORATE TOAST NOTIFICATION -->
+    <div id="toast-alert" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300 bg-[#0a2540] text-white px-4 py-3.5 rounded-2xl shadow-xl flex items-center gap-3.5 max-w-sm border border-sky-500/30">
+        <div id="toast-icon-box" class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <i class="fa-solid fa-paper-plane"></i>
+        </div>
+        <div class="text-xs">
+            <div id="toast-title" class="font-display font-bold text-white">Notificación enviada a la familia</div>
+            <div id="toast-desc" class="text-slate-300 text-[11px] mt-0.5">Entregado en la App Parent Connect</div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // S.I.C.A.E. INTERCONNECTED BIOMETRIC CLOCK ENGINE (WEB 1 - ENTERPRISE EDITION)
+        // Synchronizes in real time with app_padres.html (WEB 2) via:
+        // 1. BroadcastChannel('sicae_biometric_network_v1')
+        // 2. localStorage ('sicae_attendance_events_v1', 'sicae_students_state_v1')
+        // ============================================================================
+
+        const STORAGE_EVENTS_KEY = 'sicae_attendance_events_v1';
+        const STORAGE_STUDENTS_KEY = 'sicae_students_state_v1';
+        const CHANNEL_NAME = 'sicae_biometric_network_v1';
+
+        const defaultStudents = [
+            {
+                id: 'STU-3DC-01',
+                name: 'Facundo Lauradrid',
+                initials: 'FL',
+                group: '3°DC - BTP Comercio y Ventas',
+                ci: '5.482.190-4',
+                parentName: 'Adriana Lauradrid',
+                parentPhone: '+598 99 176 046',
+                relationship: 'Madre / Tutora',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            },
+            {
+                id: 'STU-3DC-02',
+                name: 'Jennifer Martínez',
+                initials: 'JM',
+                group: '3°DC - BTP Comercio y Ventas',
+                ci: '5.519.304-8',
+                parentName: 'Roberto Martínez',
+                parentPhone: '+598 98 412 889',
+                relationship: 'Padre / Tutor',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            },
+            {
+                id: 'STU-3DC-03',
+                name: 'Miriam Méndez',
+                initials: 'MM',
+                group: '3°DC - BTP Comercio y Ventas',
+                ci: '5.601.742-1',
+                parentName: 'Carolina Méndez',
+                parentPhone: '+598 91 735 210',
+                relationship: 'Madre / Tutora',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            },
+            {
+                id: 'STU-3DC-04',
+                name: 'Lucas Rodríguez',
+                initials: 'LR',
+                group: '3°DC - BTP Comercio y Ventas',
+                ci: '5.688.910-7',
+                parentName: 'Martín Rodríguez',
+                parentPhone: '+598 94 309 115',
+                relationship: 'Padre / Tutor',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            },
+            {
+                id: 'STU-3DC-05',
+                name: 'Valentina Suárez',
+                initials: 'VS',
+                group: '2°BB - Bachillerato Tecnológico',
+                ci: '5.712.405-2',
+                parentName: 'Lucía Fernández',
+                parentPhone: '+598 99 824 601',
+                relationship: 'Madre / Tutora',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            },
+            {
+                id: 'STU-3DC-06',
+                name: 'Santiago Pereyra',
+                initials: 'SP',
+                group: '1°BA - Educación Media Tecnológica',
+                ci: '5.890.112-9',
+                parentName: 'Diego Pereyra',
+                parentPhone: '+598 92 550 318',
+                relationship: 'Padre / Tutor',
+                status: 'OUTSIDE',
+                lastTimestamp: null
+            }
+        ];
+
+        let students = [];
+        let eventsLog = [];
+        let selectedStudentId = 'STU-3DC-01';
+        let selectedMode = 'ENTRADA';
+        let soundEnabled = true;
+        let isScanning = false;
+        let scanInterval = null;
+        let scanProgress = 0;
+        let mirrorVisible = false;
+
+        let bc = null;
+        try {
+            if ('BroadcastChannel' in window) {
+                bc = new BroadcastChannel(CHANNEL_NAME);
+                bc.onmessage = (ev) => {
+                    if (ev.data && ev.data.type === 'STATE_UPDATED') {
+                        loadSharedState();
+                        renderAll();
+                    }
+                };
+            }
+        } catch (e) {}
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_EVENTS_KEY || e.key === STORAGE_STUDENTS_KEY) {
+                loadSharedState();
+                renderAll();
+            }
+        });
+
+        function safeGetStorage(key) {
+            try {
+                const raw = localStorage.getItem(key);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function safeSetStorage(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (e) {}
+        }
+
+        function loadSharedState() {
+            const savedStudents = safeGetStorage(STORAGE_STUDENTS_KEY);
+            if (savedStudents && Array.isArray(savedStudents) && savedStudents.length > 0) {
+                students = savedStudents;
+            } else {
+                students = JSON.parse(JSON.stringify(defaultStudents));
+                safeSetStorage(STORAGE_STUDENTS_KEY, students);
+            }
+
+            const savedEvents = safeGetStorage(STORAGE_EVENTS_KEY);
+            if (savedEvents && Array.isArray(savedEvents)) {
+                eventsLog = savedEvents;
+            } else {
+                eventsLog = [];
+                safeSetStorage(STORAGE_EVENTS_KEY, eventsLog);
+            }
+
+            if (!students.find(s => s.id === selectedStudentId)) {
+                selectedStudentId = students[0].id;
+            }
+        }
+
+        function broadcastStateUpdate(latestEvent = null) {
+            safeSetStorage(STORAGE_STUDENTS_KEY, students);
+            safeSetStorage(STORAGE_EVENTS_KEY, eventsLog);
+            try {
+                if (bc) {
+                    bc.postMessage({
+                        type: 'STATE_UPDATED',
+                        event: latestEvent,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (e) {}
+        }
+
+        let audioCtx = null;
+        function playTerminalTone(type = 'beep') {
+            if (!soundEnabled) return;
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                if (!audioCtx) audioCtx = new AudioContextClass();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                if (type === 'scan_tick') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(680, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'entry_ok') {
+                    [980, 1320].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.11);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.16);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.11);
+                        osc.stop(now + idx * 0.11 + 0.16);
+                    });
+                } else if (type === 'exit_ok') {
+                    [1180, 880].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.11);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.16);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.11);
+                        osc.stop(now + idx * 0.11 + 0.16);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function generateBiometricHash(student) {
+            const seed = `${student.id}-${student.ci}-${Date.now()}`;
+            let hash = '';
+            const hex = '0123456789ABCDEF';
+            for (let i = 0; i < 32; i++) {
+                const code = (seed.charCodeAt(i % seed.length) * (i + 17) + Math.floor(Math.random() * 256)) % 16;
+                hash += hex[code];
+            }
+            return `0x${hash.slice(0, 8)}...${hash.slice(-6)}`;
+        }
+
+        function formatClockTime(dateObj) {
+            return dateObj.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        }
+
+        function formatShortTime(dateObj) {
+            return dateObj.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+
+        function updateClockDisplay() {
+            const now = new Date();
+            const clockEl = document.getElementById('live-clock');
+            const dateEl = document.getElementById('live-date');
+            const mirrorTimeEl = document.getElementById('mirror-phone-time');
+            if (clockEl) clockEl.textContent = formatClockTime(now);
+            if (mirrorTimeEl) mirrorTimeEl.textContent = formatShortTime(now);
+            if (dateEl) {
+                const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                const str = now.toLocaleDateString('es-UY', opts);
+                dateEl.textContent = str.charAt(0).toUpperCase() + str.slice(1);
+            }
+        }
+        setInterval(updateClockDisplay, 1000);
+
+        function renderStudentList() {
+            const listEl = document.getElementById('student-list');
+            const countBadge = document.getElementById('student-count-badge');
+            if (!listEl) return;
+            if (countBadge) countBadge.textContent = `${students.length} registrados`;
+
+            listEl.innerHTML = '';
+            students.forEach(stu => {
+                const isSelected = stu.id === selectedStudentId;
+                const isInside = stu.status === 'INSIDE';
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl border transition cursor-pointer flex items-center justify-between gap-3 ${
+                    isSelected
+                        ? 'bg-sky-50/90 border-sky-500 shadow-sm'
+                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'
+                }`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl ${isSelected ? 'bg-[#0a2540] text-white' : 'bg-slate-100 text-slate-700'} font-display font-bold text-xs flex items-center justify-center shrink-0">
+                            ${stu.initials}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold text-slate-900 truncate">${stu.name}</div>
+                            <div class="text-[11px] text-slate-500 truncate">${stu.group}</div>
+                            <div class="text-[11px] text-sky-700 font-medium truncate"><i class="fa-solid fa-user-check mr-1"></i>Tutor: ${stu.parentName}</div>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                            isInside
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200'
+                        }">
+                            ${isInside ? 'En el centro' : 'Fuera'}
+                        </span>
+                        ${stu.lastTimestamp ? `<div class="text-[10px] text-slate-400 font-medium mt-1">${stu.lastTimestamp}</div>` : ''}
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    selectedStudentId = stu.id;
+                    setModeButtonState(stu.status === 'INSIDE' ? 'SALIDA' : 'ENTRADA');
+                    renderAll();
+                });
+                listEl.appendChild(card);
+            });
+        }
+
+        function renderLCDScreen() {
+            const stu = students.find(s => s.id === selectedStudentId) || students[0];
+            if (!stu) return;
+
+            document.getElementById('lcd-avatar').textContent = stu.initials;
+            document.getElementById('lcd-student-name').textContent = stu.name;
+            document.getElementById('lcd-student-meta').textContent = `${stu.group} • C.I.: ${stu.ci}`;
+            document.getElementById('lcd-parent-meta').innerHTML = `<i class="fa-solid fa-mobile-screen text-emerald-400 mr-1"></i> Notificar a: <span class="text-slate-200 font-medium">${stu.parentName} (${stu.relationship})</span>`;
+
+            const stateBadge = document.getElementById('lcd-student-CurrentState');
+            if (stu.status === 'INSIDE') {
+                stateBadge.textContent = 'En el centro';
+                stateBadge.className = 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0';
+            } else {
+                stateBadge.textContent = 'Fuera del centro';
+                stateBadge.className = 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 shrink-0';
+            }
+        }
+
+        function renderLogsAndMirror() {
+            const tbody = document.getElementById('clock-logs-body');
+            const mirrorList = document.getElementById('mirror-notifications');
+            if (!tbody) return;
+
+            if (eventsLog.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
+                            Aún no se registraron marcaciones en esta sesión. Seleccione un alumno y presione el sensor de huella para enviar la notificación a los padres.
+                        </td>
+                    </tr>
+                `;
+                if (mirrorList) {
+                    mirrorList.innerHTML = `
+                        <div class="text-center py-10 px-3 text-slate-400 text-xs">
+                            <i class="fa-regular fa-bell text-2xl mb-2 block text-slate-500"></i>
+                            Esperando lectura de huella en el reloj...
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            tbody.innerHTML = eventsLog.slice(0, 12).map(ev => {
+                const isEntry = ev.eventType === 'ENTRADA';
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 px-3.5 font-mono-tech text-slate-900 font-semibold">${ev.timeFormatted}</td>
+                        <td class="py-3 px-3.5">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                                isEntry
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-sky-50 text-sky-700 border border-sky-200'
+                            }">
+                                <i class="fa-solid ${isEntry ? 'fa-right-to-bracket' : 'fa-right-from-bracket'}"></i>
+                                ${ev.eventType}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3.5">
+                            <div class="font-semibold text-slate-900">${ev.studentName}</div>
+                            <div class="text-[11px] text-slate-500">${ev.studentGroup}</div>
+                        </td>
+                        <td class="py-3 px-3.5">
+                            <div class="font-medium text-slate-800">${ev.parentName}</div>
+                            <div class="text-[11px] text-emerald-600 font-medium"><i class="fa-solid fa-check-double mr-1"></i>Notificación entregada</div>
+                        </td>
+                        <td class="py-3 px-3.5 font-mono-tech text-[11px] text-slate-600">${ev.biometricHash}</td>
+                        <td class="py-3 px-3.5 text-right">
+                            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                Sincronizado
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (mirrorList) {
+                mirrorList.innerHTML = eventsLog.slice(0, 8).map(ev => {
+                    const isEntry = ev.eventType === 'ENTRADA';
+                    return `
+                        <div class="p-3 rounded-2xl bg-slate-800/90 border ${
+                            isEntry ? 'border-emerald-500/40' : 'border-sky-500/40'
+                        }">
+                            <div class="flex items-center justify-between text-[10px] mb-1">
+                                <span class="${isEntry ? 'text-emerald-400' : 'text-sky-400'} font-bold">
+                                    <i class="fa-solid fa-fingerprint mr-1"></i> ${ev.eventType} CONFIRMADA
+                                </span>
+                                <span class="text-slate-400 font-mono-tech">${ev.timeFormatted}</span>
+                            </div>
+                            <div class="text-xs font-bold text-white">${ev.studentName}</div>
+                            <p class="text-[11px] text-slate-300 mt-0.5 leading-snug">
+                                ${isEntry
+                                    ? `Ingresó a UTU Las Piedras 2 a las ${ev.timeFormatted}.`
+                                    : `Salió de UTU Las Piedras 2 a las ${ev.timeFormatted}.`
+                                }
+                            </p>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderAll() {
+            renderStudentList();
+            renderLCDScreen();
+            renderLogsAndMirror();
+        }
+
+        function triggerBiometricVerification() {
+            const stu = students.find(s => s.id === selectedStudentId);
+            if (!stu) return;
+
+            const now = new Date();
+            const timeFormatted = formatClockTime(now);
+            const dateFormatted = now.toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            const eventType = selectedMode === 'SALIDA' ? 'SALIDA' : 'ENTRADA';
+
+            stu.status = eventType === 'ENTRADA' ? 'INSIDE' : 'OUTSIDE';
+            stu.lastTimestamp = `${eventType} ${formatShortTime(now)}`;
+            setModeButtonState(stu.status === 'INSIDE' ? 'SALIDA' : 'ENTRADA');
+
+            const hash = generateBiometricHash(stu);
+            const newEvent = {
+                id: 'EVT-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                studentId: stu.id,
+                studentName: stu.name,
+                studentInitials: stu.initials,
+                studentGroup: stu.group,
+                studentCI: stu.ci,
+                parentName: stu.parentName,
+                parentPhone: stu.parentPhone,
+                relationship: stu.relationship,
+                eventType: eventType,
+                timeFormatted: timeFormatted,
+                dateFormatted: dateFormatted,
+                timestamp: now.getTime(),
+                deviceNode: 'Hub Biométrico K14 – ZKTeco (Acceso Principal)',
+                centerName: 'Escuela Técnica Las Piedras 2 (ANEP - UTU)',
+                biometricHash: hash
+            };
+
+            eventsLog.unshift(newEvent);
+            if (eventsLog.length > 50) eventsLog.pop();
+
+            broadcastStateUpdate(newEvent);
+
+            const pad = document.getElementById('scanner-pad');
+            const icon = document.getElementById('scanner-icon');
+            const msgEl = document.getElementById('lcd-message');
+            const pctEl = document.getElementById('lcd-percent');
+            const progEl = document.getElementById('lcd-progress');
+            const hashEl = document.getElementById('lcd-hash');
+            const ledEl = document.getElementById('led-indicator');
+
+            pad.classList.remove('scanning');
+            if (eventType === 'ENTRADA') {
+                pad.classList.add('success-entry');
+                icon.className = 'fa-solid fa-circle-check text-6xl text-emerald-400 scale-110 transition-transform';
+                msgEl.innerHTML = `<span class="text-emerald-400 font-semibold">✓ Entrada registrada • Aviso enviado a ${stu.parentName}</span>`;
+                pctEl.textContent = 'Verificado';
+                pctEl.className = 'text-emerald-400 font-semibold';
+                ledEl.className = 'w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_14px_#10b981]';
+                playTerminalTone('entry_ok');
+            } else {
+                pad.classList.add('success-exit');
+                icon.className = 'fa-solid fa-circle-check text-6xl text-sky-400 scale-110 transition-transform';
+                msgEl.innerHTML = `<span class="text-sky-400 font-semibold">✓ Salida registrada • Aviso enviado a ${stu.parentName}</span>`;
+                pctEl.textContent = 'Verificado';
+                pctEl.className = 'text-sky-400 font-semibold';
+                ledEl.className = 'w-3 h-3 rounded-full bg-sky-400 shadow-[0_0_14px_#38bdf8]';
+                playTerminalTone('exit_ok');
+            }
+
+            progEl.style.width = '100%';
+            hashEl.textContent = `Token SHA-256: ${hash}`;
+
+            renderAll();
+            showToast(
+                `${eventType} de ${stu.name} (${timeFormatted})`,
+                `Notificación enviada al celular de ${stu.parentName}`
+            );
+
+            setTimeout(() => {
+                pad.classList.remove('success-entry', 'success-exit');
+                icon.className = 'fa-solid fa-fingerprint text-6xl text-sky-400 group-hover:scale-105 transition-transform duration-300';
+                msgEl.textContent = 'Coloque su dedo en el lector óptico...';
+                pctEl.textContent = 'Listo';
+                pctEl.className = 'text-sky-400 font-semibold';
+                progEl.style.width = '0%';
+            }, 2400);
+        }
+
+        function startPressScan(e) {
+            if (e && e.type === 'mousedown' && e.button !== 0) return;
+            if (isScanning) return;
+            isScanning = true;
+            scanProgress = 0;
+
+            const pad = document.getElementById('scanner-pad');
+            const msgEl = document.getElementById('lcd-message');
+            const pctEl = document.getElementById('lcd-percent');
+            const progEl = document.getElementById('lcd-progress');
+
+            pad.classList.add('scanning');
+            msgEl.textContent = 'Verificando identidad biométrica...';
+            playTerminalTone('scan_tick');
+
+            clearInterval(scanInterval);
+            scanInterval = setInterval(() => {
+                scanProgress += 20;
+                progEl.style.width = `${Math.min(100, scanProgress)}%`;
+                pctEl.textContent = `${Math.min(100, scanProgress)}%`;
+                if (scanProgress === 60) playTerminalTone('scan_tick');
+
+                if (scanProgress >= 100) {
+                    clearInterval(scanInterval);
+                    isScanning = false;
+                    triggerBiometricVerification();
+                }
+            }, 110);
+        }
+
+        function stopPressScan() {
+            if (!isScanning) return;
+            clearInterval(scanInterval);
+            isScanning = false;
+            const progEl = document.getElementById('lcd-progress');
+            const pctEl = document.getElementById('lcd-percent');
+            progEl.style.width = '100%';
+            pctEl.textContent = '100%';
+            setTimeout(() => {
+                triggerBiometricVerification();
+            }, 180);
+        }
+
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast-alert');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-desc').textContent = desc;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3400);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSharedState();
+            updateClockDisplay();
+            renderAll();
+
+            const pad = document.getElementById('scanner-pad');
+            pad.addEventListener('mousedown', startPressScan);
+            pad.addEventListener('mouseup', stopPressScan);
+            pad.addEventListener('touchstart', (e) => { e.preventDefault(); startPressScan(e); }, { passive: false });
+            pad.addEventListener('touchend', (e) => { e.preventDefault(); stopPressScan(); }, { passive: false });
+
+            pad.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    startPressScan(e);
+                    setTimeout(() => stopPressScan(), 320);
+                }
+            });
+
+            window.setModeButtonState = function(mode) {
+                selectedMode = mode;
+                document.querySelectorAll('.mode-btn').forEach(b => {
+                    const bMode = b.getAttribute('data-mode');
+                    if (bMode === mode) {
+                        if (mode === 'ENTRADA') {
+                            b.className = 'mode-btn active-mode py-2.5 px-3 rounded-xl border border-emerald-400 bg-emerald-500/20 text-white text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer';
+                        } else {
+                            b.className = 'mode-btn active-mode py-2.5 px-3 rounded-xl border border-sky-400 bg-sky-500/20 text-white text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer';
+                        }
+                    } else {
+                        b.className = 'mode-btn py-2.5 px-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 hover:border-slate-500 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer';
+                    }
+                });
+            };
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setModeButtonState(btn.getAttribute('data-mode'));
+                });
+            });
+
+            const formCustom = document.getElementById('custom-student-form');
+            document.getElementById('btn-open-custom').addEventListener('click', () => {
+                formCustom.classList.toggle('hidden');
+            });
+            document.getElementById('btn-cancel-custom').addEventListener('click', () => {
+                formCustom.classList.add('hidden');
+            });
+            formCustom.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('inp-student-name').value.trim();
+                const group = document.getElementById('inp-student-group').value.trim();
+                const ci = document.getElementById('inp-student-ci').value.trim();
+                const parentName = document.getElementById('inp-parent-name').value.trim();
+                if (!name || !parentName) return;
+
+                const parts = name.split(' ').filter(Boolean);
+                const initials = parts.length >= 2
+                    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+                    : name.slice(0, 2).toUpperCase();
+
+                const newStu = {
+                    id: 'STU-CUSTOM-' + Date.now(),
+                    name,
+                    initials,
+                    group: group || '3°DC - BTP',
+                    ci: ci || '5.500.123-4',
+                    parentName,
+                    parentPhone: '+598 99 176 046',
+                    relationship: 'Padre / Madre / Tutor',
+                    status: 'OUTSIDE',
+                    lastTimestamp: null
+                };
+                students.unshift(newStu);
+                selectedStudentId = newStu.id;
+                broadcastStateUpdate();
+                renderAll();
+                formCustom.reset();
+                formCustom.classList.add('hidden');
+            });
+
+            document.getElementById('btn-clear-logs').addEventListener('click', () => {
+                eventsLog = [];
+                students.forEach(s => { s.status = 'OUTSIDE'; s.lastTimestamp = null; });
+                broadcastStateUpdate();
+                renderAll();
+                showToast('Registros reiniciados', 'Terminal y App de Padres sincronizados');
+            });
+
+            document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                const icon = document.getElementById('sound-icon');
+                icon.className = soundEnabled ? 'fa-solid fa-volume-high text-sky-600' : 'fa-solid fa-volume-xmark text-slate-400';
+            });
+
+            const toggleMirror = () => {
+                mirrorVisible = !mirrorVisible;
+                const mirrorCol = document.getElementById('mirror-column');
+                const termCol = document.getElementById('terminal-column');
+                const label = document.getElementById('mirror-btn-label');
+                if (mirrorVisible) {
+                    mirrorCol.classList.remove('hidden');
+                    mirrorCol.classList.add('flex');
+                    termCol.className = 'lg:col-span-5 flex flex-col gap-5';
+                    label.textContent = 'Ocultar Vista Celular';
+                } else {
+                    mirrorCol.classList.add('hidden');
+                    mirrorCol.classList.remove('flex');
+                    termCol.className = 'lg:col-span-8 flex flex-col gap-5';
+                    label.textContent = 'Mostrar Celular Espejo (En Vivo)';
+                }
+            };
+            document.getElementById('btn-toggle-mirror').addEventListener('click', toggleMirror);
+            document.getElementById('btn-close-mirror').addEventListener('click', toggleMirror);
+        });
+    </script>
+</body>
+</html>
